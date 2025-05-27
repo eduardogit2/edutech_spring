@@ -46,4 +46,3 @@ public class Profesor {
     @JsonManagedReference(value = "profesor-curso")
     private List<Curso> cursos;
 }
-

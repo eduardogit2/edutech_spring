@@ -18,7 +18,7 @@ public class Material {
     private Long id;
 
     @NotBlank
-    private String tipo; // PDF, VIDEO, LINK
+    private String tipo;
 
     @NotBlank
     private String url;

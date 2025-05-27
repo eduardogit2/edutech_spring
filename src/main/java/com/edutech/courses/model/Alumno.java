@@ -39,12 +39,12 @@ public class Alumno {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Past(message = "La fecha de nacimiento debe ser en el pasado")
+    @Past(message = "La fecha de nacimiento debe ser valida")
     private LocalDate fechaNacimiento;
 
     private LocalDate fechaRegistro;
 
-    @Pattern(regexp = "^\\+56\\s?9\\s?\\d{4}\\s?\\d{4}$", message = "Teléfono chileno no válido (formato +56 9 XXXX XXXX)")
+    @Pattern(regexp = "^\\+56\\s?9\\s?\\d{4}\\s?\\d{4}$", message = "Teléfono no válido (formato +56 9 XXXX XXXX)")
     private String telefono;
 
     private String direccion;

@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface AlumnoRepository extends JpaRepository<Alumno, Long> {
     Optional<Alumno> findByEmail(String email);
-    Optional<Alumno> findByRun(String run); // Nuevo método
+    Optional<Alumno> findByRun(String run); 
 }

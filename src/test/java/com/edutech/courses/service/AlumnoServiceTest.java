@@ -2,7 +2,6 @@ package com.edutech.courses.service;
 
 import com.edutech.courses.model.Alumno;
 import com.edutech.courses.repository.AlumnoRepository;
-import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -12,6 +11,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,22 +25,19 @@ class AlumnoServiceTest {
     @InjectMocks
     private AlumnoService alumnoService;
 
-    private Faker faker;
     private Alumno alumno;
 
     @BeforeEach
     void setUp() {
-        faker = new Faker();
-
         alumno = Alumno.builder()
             .id(1L)
             .run("12.345.678-9")
-            .nombre(faker.name().firstName())
-            .apellidoPaterno(faker.name().lastName())
-            .email(faker.internet().emailAddress())
+            .nombre("Eduardo")
+            .apellidoPaterno("Uribe")
+            .email("eduardo@mail.cl")
             .fechaNacimiento(LocalDate.of(2000, 1, 1))
             .telefono("+56 9 1234 5678")
-            .direccion(faker.address().fullAddress())
+            .direccion("Av. Providencia 1234, Santiago")
             .build();
     }
 

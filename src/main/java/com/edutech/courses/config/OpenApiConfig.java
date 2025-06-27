@@ -2,7 +2,6 @@ package com.edutech.courses.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.*;
-import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,9 +16,7 @@ public class OpenApiConfig {
                 .version("1.0")
                 .description("Microservicio de gestión académica de cursos")
                 .contact(new Contact()
-                    .name("Eduardo Uribe")
-                    .email("eduardo@ejemplo.cl"))
-                .license(new License().name("MIT").url("https://opensource.org/licenses/MIT")))
-            .addServersItem(new Server().url("http://localhost:8080"));
+                    .name("Edutech team")
+                    .email("edutech@ejemplo.cl")));
     }
 }

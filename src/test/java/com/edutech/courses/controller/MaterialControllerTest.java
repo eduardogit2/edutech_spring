@@ -1,6 +1,7 @@
 package com.edutech.courses.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -44,6 +45,14 @@ class MaterialControllerTest {
     }
 
     @Test
+    void testListar_Vacio() throws Exception {
+        when(materialService.listar()).thenReturn(List.of());
+        mockMvc.perform(get("/api/materiales"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
     void testCrear() throws Exception {
         when(materialService.crear(any())).thenReturn(material);
         mockMvc.perform(post("/api/materiales")
@@ -51,5 +60,28 @@ class MaterialControllerTest {
             .content(objectMapper.writeValueAsString(material)))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.tipo").value("PDF"));
+    }
+
+    @Test
+    void testPorCurso() throws Exception {
+        when(materialService.porCurso(1L)).thenReturn(List.of(material));
+        mockMvc.perform(get("/api/materiales/curso/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].tipo").value("PDF"));
+    }
+
+    @Test
+    void testPorEvaluacion() throws Exception {
+        when(materialService.porEvaluacion(1L)).thenReturn(List.of(material));
+        mockMvc.perform(get("/api/materiales/evaluacion/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].tipo").value("PDF"));
+    }
+
+    @Test
+    void testEliminar() throws Exception {
+        doNothing().when(materialService).eliminar(1L);
+        mockMvc.perform(delete("/api/materiales/1"))
+            .andExpect(status().isNoContent());
     }
 }

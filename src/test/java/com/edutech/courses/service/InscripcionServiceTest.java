@@ -36,30 +36,51 @@ class InscripcionServiceTest {
     @Test
     void testListar() {
         when(inscripcionRepository.findAll()).thenReturn(List.of(inscripcion));
-        assertFalse(inscripcionService.listar().isEmpty());
+        List<Inscripcion> lista = inscripcionService.listar();
+        assertFalse(lista.isEmpty());
+        assertEquals(1, lista.size());
+        assertEquals(Inscripcion.EstadoInscripcion.MATRICULADO, lista.get(0).getEstado());
     }
 
     @Test
     void testPorCurso() {
         when(inscripcionRepository.findByCursoId(1L)).thenReturn(List.of(inscripcion));
-        assertFalse(inscripcionService.porCurso(1L).isEmpty());
+        List<Inscripcion> porCurso = inscripcionService.porCurso(1L);
+        assertFalse(porCurso.isEmpty());
+        assertEquals(1, porCurso.size());
     }
 
     @Test
     void testPorAlumno() {
         when(inscripcionRepository.findByAlumnoId(1L)).thenReturn(List.of(inscripcion));
-        assertFalse(inscripcionService.porAlumno(1L).isEmpty());
+        List<Inscripcion> porAlumno = inscripcionService.porAlumno(1L);
+        assertFalse(porAlumno.isEmpty());
+        assertEquals(1, porAlumno.size());
     }
 
     @Test
     void testCrear() {
         when(inscripcionRepository.save(any())).thenReturn(inscripcion);
-        assertEquals(Inscripcion.EstadoInscripcion.MATRICULADO, inscripcionService.crear(inscripcion).getEstado());
+        Inscripcion creado = inscripcionService.crear(inscripcion);
+        assertEquals(Inscripcion.EstadoInscripcion.MATRICULADO, creado.getEstado());
+        assertEquals(1L, creado.getId());
     }
 
     @Test
     void testEliminar() {
         inscripcionService.eliminar(1L);
         verify(inscripcionRepository).deleteById(1L);
+    }
+
+    @Test
+    void testCrearConEstadoDiferente() {
+        Inscripcion otra = Inscripcion.builder()
+                .id(2L)
+                .estado(Inscripcion.EstadoInscripcion.CANCELADO)
+                .build();
+        when(inscripcionRepository.save(any())).thenReturn(otra);
+        Inscripcion creado = inscripcionService.crear(otra);
+        assertEquals(Inscripcion.EstadoInscripcion.CANCELADO, creado.getEstado());
+        assertEquals(2L, creado.getId());
     }
 }

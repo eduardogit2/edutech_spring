@@ -45,13 +45,23 @@ class CursoServiceTest {
         when(cursoRepository.findAll()).thenReturn(List.of(curso));
         List<Curso> cursos = cursoService.listar();
         assertFalse(cursos.isEmpty());
+        assertEquals(1, cursos.size());
+        assertEquals("CUR123", cursos.get(0).getCodigo());
     }
 
     @Test
-    void testBuscarPorId() {
+    void testBuscarPorId_Existente() {
         when(cursoRepository.findById(1L)).thenReturn(Optional.of(curso));
         Optional<Curso> encontrado = cursoService.buscarPorId(1L);
         assertTrue(encontrado.isPresent());
+        assertEquals("Matemáticas Avanzadas", encontrado.get().getTitulo());
+    }
+
+    @Test
+    void testBuscarPorId_NoExistente() {
+        when(cursoRepository.findById(2L)).thenReturn(Optional.empty());
+        Optional<Curso> encontrado = cursoService.buscarPorId(2L);
+        assertTrue(encontrado.isEmpty());
     }
 
     @Test

@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import com.edutech.courses.assamblers.AlumnoModelAssembler;
 import com.edutech.courses.model.Alumno;
 import com.edutech.courses.service.AlumnoService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 
 @RestController

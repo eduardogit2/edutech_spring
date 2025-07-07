@@ -35,7 +35,8 @@ class AlumnoControllerTest {
             .id(1L)
             .run("12.345.678-9")
             .nombre("Juan")
-            .email("juan@correo.com").build();
+            .email("juan@correo.com")
+            .build();
     }
 
     @Test
@@ -47,7 +48,7 @@ class AlumnoControllerTest {
     }
 
     @Test
-    void testBuscarPorId() throws Exception {
+    void testBuscarPorId_Existente() throws Exception {
         when(alumnoService.buscarPorId(1L)).thenReturn(Optional.of(alumno));
         mockMvc.perform(get("/api/alumnos/1"))
             .andExpect(status().isOk())
@@ -55,12 +56,48 @@ class AlumnoControllerTest {
     }
 
     @Test
-    void testCrear() throws Exception {
+    void testBuscarPorId_NoExistente() throws Exception {
+        when(alumnoService.buscarPorId(2L)).thenReturn(Optional.empty());
+        mockMvc.perform(get("/api/alumnos/2"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testCrear_Valido() throws Exception {
         when(alumnoService.crear(any())).thenReturn(alumno);
         mockMvc.perform(post("/api/alumnos")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(alumno)))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.run").value("12.345.678-9"));
+    }
+
+    @Test
+    void testCrear_InvalidRun() throws Exception {
+        Alumno alumnoInvalido = Alumno.builder()
+            .run("")
+            .nombre("Pepe")
+            .email("pepe@correo.com")
+            .build();
+
+        mockMvc.perform(post("/api/alumnos")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(alumnoInvalido)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testEliminar_Existente() throws Exception {
+        when(alumnoService.buscarPorId(1L)).thenReturn(Optional.of(alumno));
+
+        mockMvc.perform(delete("/api/alumnos/1"))
+            .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void testEliminar_NoExistente() throws Exception {
+        when(alumnoService.buscarPorId(2L)).thenReturn(Optional.empty());
+        mockMvc.perform(delete("/api/alumnos/2"))
+            .andExpect(status().isNotFound());
     }
 }

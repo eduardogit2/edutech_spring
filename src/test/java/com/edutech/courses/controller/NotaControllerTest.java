@@ -1,6 +1,7 @@
 package com.edutech.courses.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.edutech.courses.model.Nota;
 import com.edutech.courses.service.NotaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 @WebMvcTest(NotaController.class)
 class NotaControllerTest {
@@ -50,5 +52,12 @@ class NotaControllerTest {
         mockMvc.perform(get("/api/notas/alumno/1"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].calificacion").value(6.5));
+    }
+
+    @Test
+    void testEliminar() throws Exception {
+        doNothing().when(notaService).eliminar(1L);
+        mockMvc.perform(delete("/api/notas/1"))
+            .andExpect(status().isNoContent());
     }
 }

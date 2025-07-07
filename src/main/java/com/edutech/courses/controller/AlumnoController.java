@@ -10,11 +10,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/alumnos")
@@ -41,7 +43,7 @@ public class AlumnoController {
         @ApiResponse(responseCode = "404", description = "Alumno no encontrado")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Alumno> buscar(@Parameter(description = "ID del alumno a buscar") @PathVariable Long id) {
+    public ResponseEntity<Alumno> buscar(@Valid @Parameter(description = "ID del alumno a buscar") @PathVariable Long id) {
         return service.buscarPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -55,7 +57,7 @@ public class AlumnoController {
         @ApiResponse(responseCode = "404", description = "Alumno no encontrado")
     })
     @GetMapping("/run/{run}")
-    public ResponseEntity<Alumno> buscarPorRun(@Parameter(description = "RUN del alumno") @PathVariable String run) {
+    public ResponseEntity<Alumno> buscarPorRun(@Valid @Parameter(description = "RUN del alumno") @PathVariable String run) {
         return service.buscarPorRun(run)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -69,7 +71,7 @@ public class AlumnoController {
         @ApiResponse(responseCode = "400", description = "Datos invalidos")
     })
     @PostMapping
-    public ResponseEntity<Alumno> crear(@RequestBody Alumno alumno) {
+    public ResponseEntity<Alumno> crear(@Valid @RequestBody Alumno alumno) {
         return ResponseEntity.status(201).body(service.crear(alumno));
     }
 
@@ -79,7 +81,11 @@ public class AlumnoController {
         @ApiResponse(responseCode = "404", description = "Alumno no encontrado")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@Parameter(description = "ID del alumno a eliminar") @PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@Valid @Parameter(description = "ID del alumno a eliminar") @PathVariable Long id) {
+        Optional<Alumno> alumnoExistente = service.buscarPorId(id);
+        if (alumnoExistente.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
         service.eliminar(id);
         return ResponseEntity.noContent().build();
     }

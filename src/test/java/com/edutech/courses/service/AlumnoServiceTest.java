@@ -21,20 +21,17 @@ class AlumnoServiceTest {
 
     @Mock
     private AlumnoRepository alumnoRepository;
-
     @InjectMocks
     private AlumnoService alumnoService;
-
     private Alumno alumno;
-
     @BeforeEach
     void setUp() {
         alumno = Alumno.builder()
             .id(1L)
             .run("12.345.678-9")
-            .nombre("Eduardo")
-            .apellidoPaterno("Uribe")
-            .email("eduardo@mail.cl")
+            .nombre("jose")
+            .apellidoPaterno("parra")
+            .email("jose@gmail.cl")
             .fechaNacimiento(LocalDate.of(2000, 1, 1))
             .telefono("+56 9 1234 5678")
             .direccion("Av. Providencia 1234, Santiago")
@@ -44,9 +41,7 @@ class AlumnoServiceTest {
     @Test
     void testCrearAlumno() {
         when(alumnoRepository.save(any(Alumno.class))).thenReturn(alumno);
-
         Alumno creado = alumnoService.crear(alumno);
-
         assertNotNull(creado);
         assertEquals(alumno.getRun(), creado.getRun());
         verify(alumnoRepository).save(alumno);
@@ -55,9 +50,7 @@ class AlumnoServiceTest {
     @Test
     void testBuscarPorId_Encontrado() {
         when(alumnoRepository.findById(1L)).thenReturn(Optional.of(alumno));
-
         Optional<Alumno> encontrado = alumnoService.buscarPorId(1L);
-
         assertTrue(encontrado.isPresent());
         assertEquals(alumno.getId(), encontrado.get().getId());
     }
@@ -65,9 +58,7 @@ class AlumnoServiceTest {
     @Test
     void testBuscarPorRun_Existente() {
         when(alumnoRepository.findByRun("12.345.678-9")).thenReturn(Optional.of(alumno));
-
         Optional<Alumno> resultado = alumnoService.buscarPorRun("12.345.678-9");
-
         assertTrue(resultado.isPresent());
         assertEquals("12.345.678-9", resultado.get().getRun());
     }

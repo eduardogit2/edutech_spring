@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,7 +64,7 @@ public class CursoController {
             @ApiResponse(responseCode = "404", description = "Curso no encontrado")
     })
     @GetMapping("/codigo/{codigo}")
-    public ResponseEntity<Curso> buscarPorCodigo(@Parameter(description = "Código del curso a buscar") @PathVariable String codigo) { 
+    public ResponseEntity<Curso> buscarPorCodigo(@Parameter(description = "Codigo del curso a buscar") @PathVariable String codigo) { 
         return service.buscarPorCodigo(codigo)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -76,7 +77,7 @@ public class CursoController {
             @ApiResponse(responseCode = "400", description = "Datos inválidos") 
     })
     @PostMapping
-    public ResponseEntity<Curso> crear(@RequestBody Curso curso) {
+    public ResponseEntity<Curso> crear(@Valid @RequestBody Curso curso) {
         return ResponseEntity.status(201).body(service.crear(curso));
     }
 
@@ -85,9 +86,12 @@ public class CursoController {
             @ApiResponse(responseCode = "204", description = "Curso eliminado exitosamente"),
             @ApiResponse(responseCode = "404", description = "Curso no encontrado")
     })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@Parameter(description = "ID del curso a eliminar") @PathVariable Long id) { 
+        @DeleteMapping("/{id}")
+        public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        if (service.buscarPorId(id).isEmpty()) {
+                return ResponseEntity.notFound().build();
+        }
         service.eliminar(id);
         return ResponseEntity.noContent().build();
-    }
+        }
 }

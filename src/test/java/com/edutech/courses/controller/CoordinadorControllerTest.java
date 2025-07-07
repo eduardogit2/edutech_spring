@@ -46,7 +46,7 @@ class CoordinadorControllerTest {
     }
 
     @Test
-    void testBuscarPorId() throws Exception {
+    void testBuscarPorId_Existente() throws Exception {
         when(coordinadorService.buscarPorId(1L)).thenReturn(Optional.of(coordinador));
         mockMvc.perform(get("/api/coordinadores/1"))
             .andExpect(status().isOk())
@@ -54,12 +54,46 @@ class CoordinadorControllerTest {
     }
 
     @Test
-    void testCrear() throws Exception {
+    void testBuscarPorId_NoExistente() throws Exception {
+        when(coordinadorService.buscarPorId(2L)).thenReturn(Optional.empty());
+        mockMvc.perform(get("/api/coordinadores/2"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testCrear_Valido() throws Exception {
         when(coordinadorService.crear(any())).thenReturn(coordinador);
         mockMvc.perform(post("/api/coordinadores")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(coordinador)))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.run").value("18.345.678-2"));
+    }
+
+    @Test
+    void testCrear_RunInvalido() throws Exception {
+        Coordinador invalido = Coordinador.builder()
+            .run("")
+            .nombre("Carlos")
+            .email("carlos@correo.com")
+            .build();
+        mockMvc.perform(post("/api/coordinadores")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(invalido)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testEliminar_Existente() throws Exception {
+        when(coordinadorService.buscarPorId(1L)).thenReturn(Optional.of(coordinador));
+            mockMvc.perform(delete("/api/coordinadores/{id}", 1L))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void testEliminar_NoExistente() throws Exception {
+        when(coordinadorService.buscarPorId(2L)).thenReturn(Optional.empty());
+        mockMvc.perform(delete("/api/coordinadores/{id}", 2L)) 
+            .andExpect(status().isNotFound());
     }
 }

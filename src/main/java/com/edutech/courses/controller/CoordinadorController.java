@@ -10,11 +10,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/coordinadores")
@@ -66,9 +68,10 @@ public class CoordinadorController {
         @ApiResponse(responseCode = "400", description = "Datos invalidos")
     })
     @PostMapping
-    public ResponseEntity<Coordinador> crear(@RequestBody Coordinador coordinador) {
+    public ResponseEntity<Coordinador> crear(@Valid @RequestBody Coordinador coordinador) {
         return ResponseEntity.status(201).body(service.crear(coordinador));
     }
+    
 
     @Operation(summary = "Eliminar coordinador")
     @ApiResponses({
@@ -76,7 +79,11 @@ public class CoordinadorController {
         @ApiResponse(responseCode = "404", description = "Coordinador no encontrado")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@Parameter(description = "ID del coordinador a eliminar") @PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@Valid @Parameter(description = "ID del coordinador a eliminar") @PathVariable Long id) {
+        Optional<Coordinador> coordinadorExistente = service.buscarPorId(id);
+        if (coordinadorExistente.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
         service.eliminar(id);
         return ResponseEntity.noContent().build();
     }

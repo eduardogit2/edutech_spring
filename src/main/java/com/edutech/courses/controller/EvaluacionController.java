@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,7 +69,7 @@ public class EvaluacionController {
             @ApiResponse(responseCode = "400", description = "Datos inválidos") 
     })
     @PostMapping
-    public ResponseEntity<Evaluacion> crear(@RequestBody Evaluacion evaluacion) {
+    public ResponseEntity<Evaluacion> crear(@Valid @RequestBody Evaluacion evaluacion) {
         return ResponseEntity.status(201).body(service.crear(evaluacion));
     }
 
@@ -79,7 +80,10 @@ public class EvaluacionController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@Parameter(description = "ID de la evaluación a eliminar") @PathVariable Long id) {
+        if (service.buscarPorId(id).isEmpty()) {
+                return ResponseEntity.notFound().build();
+        }
         service.eliminar(id);
         return ResponseEntity.noContent().build();
-    }
+        }
 }

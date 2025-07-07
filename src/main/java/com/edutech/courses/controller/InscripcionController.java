@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,19 @@ public class InscripcionController {
         return service.listar();
     }
 
+    @Operation(summary = "Buscar inscripción por ID")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Inscripción encontrada", 
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = Inscripcion.class))),
+        @ApiResponse(responseCode = "404", description = "Inscripción no encontrada")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<Inscripcion> buscarPorId(@PathVariable Long id) {
+        return service.buscarPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @Operation(summary = "Buscar inscripciones por ID de curso")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Inscripciones del curso encontradas", 
@@ -42,7 +56,7 @@ public class InscripcionController {
             @ApiResponse(responseCode = "404", description = "Curso no encontrado o sin inscripciones") 
     })
     @GetMapping("/curso/{cursoId}")
-    public List<Inscripcion> porCurso(@Parameter(description = "ID del curso para buscar inscripciones") @PathVariable Long cursoId) { 
+    public List<Inscripcion> porCurso(@Parameter(description = "ID del curso") @PathVariable Long cursoId) { 
         return service.porCurso(cursoId);
     }
 
@@ -54,7 +68,7 @@ public class InscripcionController {
             @ApiResponse(responseCode = "404", description = "Alumno no encontrado o sin inscripciones") 
     })
     @GetMapping("/alumno/{alumnoId}")
-    public List<Inscripcion> porAlumno(@Parameter(description = "ID del alumno para buscar inscripciones") @PathVariable Long alumnoId) { 
+    public List<Inscripcion> porAlumno(@Parameter(description = "ID del alumno") @PathVariable Long alumnoId) { 
         return service.porAlumno(alumnoId);
     }
 
@@ -66,7 +80,7 @@ public class InscripcionController {
             @ApiResponse(responseCode = "400", description = "Datos inválidos") 
     })
     @PostMapping
-    public ResponseEntity<Inscripcion> crear(@RequestBody Inscripcion inscripcion) {
+    public ResponseEntity<Inscripcion> crear(@Valid @RequestBody Inscripcion inscripcion) {
         return ResponseEntity.status(201).body(service.crear(inscripcion));
     }
 
@@ -76,7 +90,10 @@ public class InscripcionController {
             @ApiResponse(responseCode = "404", description = "Inscripción no encontrada") 
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@Parameter(description = "ID de la inscripción a eliminar") @PathVariable Long id) { 
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        if (service.buscarPorId(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
         service.eliminar(id);
         return ResponseEntity.noContent().build();
     }

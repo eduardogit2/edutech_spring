@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +43,7 @@ public class ProfesorController {
             @ApiResponse(responseCode = "404", description = "Profesor no encontrado")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Profesor> buscar(@Parameter(description = "ID del profesor a buscar") @PathVariable Long id) { 
+    public ResponseEntity<Profesor> buscar(@Valid @Parameter(description = "ID del profesor a buscar") @PathVariable Long id) { 
         return service.buscarPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -56,7 +57,7 @@ public class ProfesorController {
             @ApiResponse(responseCode = "404", description = "Profesor no encontrado")
     })
     @GetMapping("/run/{run}")
-    public ResponseEntity<Profesor> buscarPorRun(@Parameter(description = "RUN del profesor a buscar") @PathVariable String run) { 
+    public ResponseEntity<Profesor> buscarPorRun(@Valid @Parameter(description = "RUN del profesor a buscar") @PathVariable String run) { 
         return service.buscarPorRun(run)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -69,18 +70,23 @@ public class ProfesorController {
             ),
             @ApiResponse(responseCode = "400", description = "Datos inválidos") 
     })
-    @PostMapping
-    public ResponseEntity<Profesor> crear(@RequestBody Profesor profesor) {
-        return ResponseEntity.status(201).body(service.crear(profesor));
-    }
+        @PostMapping
+        public ResponseEntity<Profesor> crear(@Valid @RequestBody Profesor profesor) {
+                return ResponseEntity.status(201).body(service.crear(profesor));
+        }
 
     @Operation(summary = "Eliminar profesor por ID") 
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Profesor eliminado exitosamente"), 
             @ApiResponse(responseCode = "404", description = "Profesor no encontrado")
     })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@Parameter(description = "ID del profesor a eliminar") @PathVariable Long id) { 
+        @DeleteMapping("/{id}")
+        public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        if (service.buscarPorId(id).isEmpty()) {
+                return ResponseEntity.notFound().build();
+        }
+        service.eliminar(id);
         return ResponseEntity.noContent().build();
-    }
+        }
+
 }
